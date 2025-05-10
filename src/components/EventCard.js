@@ -7,36 +7,63 @@ import {
   Paper,
   Button,
   TextField,
-  Collapse
+  Collapse,
+  Dialog,
+  Checkbox, FormControlLabel, Link
 } from '@mui/material';
 import { CalendarMonth, LocationOn, Euro } from '@mui/icons-material';
 import { createReservation } from '../services/api';
+import ReservationForm from './ReservationForm';
+import axios from 'axios';
+import WaitlistForm from './WaitlistForm';
+
 
 function EventCard({ event, onReserve }) {
   const [isReserving, setIsReserving] = useState(false);
+  const [showPaymentDialog, setShowPaymentDialog] = useState(false);
   const [nombrePlaces, setNombrePlaces] = useState(1);
   const [nom, setNom] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
+  const [acceptCGV, setAcceptCGV] = useState(false); // État pour la case à cocher
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      await createReservation({
-        evenement_id: event.id,
-        nombre_places: nombrePlaces,
-        nom,
-        email
-      });
-      setIsReserving(false);
-      if (onReserve) onReserve();
-      setNombrePlaces(1);
-      setNom('');
-      setEmail('');
-      setError('');
-    } catch (err) {
-      setError('Erreur lors de la réservation');
+  
+    if (nombrePlaces < 1) {
+      alert("Veuillez sélectionner au moins une place.");
+      return;
     }
+  
+    try {
+      const res = await axios.post('https://resaback-production.up.railway.app/create-checkout-session', {
+        quantity: nombrePlaces,
+        nom,
+        email,
+        eventId: event.id, // utile si tu veux enregistrer la réservation ensuite
+      });
+
+      console.log('Session de paiement créée :', res.data);
+      
+      window.location.href = res.data.url; // Redirige vers Stripe Checkout
+    } catch (err) {
+      console.error(err);
+      alert("Erreur lors de la redirection vers le paiement.");
+    }
+  };
+
+  const handlePaymentSuccess = () => {
+    setShowPaymentDialog(false);
+    setIsReserving(false);
+    if (onReserve) onReserve();
+    setNombrePlaces(1);
+    setNom('');
+    setEmail('');
+    setError('');
+  };
+
+  const handlePaymentCancel = () => {
+    setShowPaymentDialog(false);
   };
 
   const isComplet = event.places_disponibles <= 0;
@@ -94,70 +121,115 @@ function EventCard({ event, onReserve }) {
                 fontWeight: presqueComplet ? 'bold' : 'normal'
               }}
             >
-              {getStatusText()}
+              {event.places_disponibles} {getStatusText()}
             </Typography>
           </Box>
+          {isComplet ? (
+  <>
+    <Typography color="error" sx={{ mt: 2, mb: 1 }}>
+      Toutes les places sont prises. Vous pouvez vous inscrire à la liste d'attente :
+    </Typography>
+    <WaitlistForm eventName={event.nom} />
+  </>
+) : (
+  <>
+    <Button
+      variant="contained"
+      color="primary"
+      fullWidth
+      onClick={() => setIsReserving(!isReserving)}
+      sx={{ mb: 2 }}
+    >
+      {isReserving ? 'Annuler' : 'Réserver'}
+    </Button>
 
-          {!isComplet && (
-            <>
-              <Button
-                variant={isReserving ? "outlined" : "contained"}
-                color={presqueComplet ? "warning" : "primary"}
-                fullWidth
-                onClick={() => setIsReserving(!isReserving)}
-              >
-                {isReserving ? 'Annuler' : 'Réserver'}
-              </Button>
+    <Collapse in={isReserving}>
+  <Box component="form" onSubmit={handleSubmit}>
+    <TextField
+      label="Nom"
+      value={nom}
+      onChange={(e) => setNom(e.target.value)}
+      fullWidth
+      required
+      margin="normal"
+    />
+    <TextField
+      label="Email"
+      type="email"
+      value={email}
+      onChange={(e) => setEmail(e.target.value)}
+      fullWidth
+      required
+      margin="normal"
+    />
+    <TextField
+      label="Nombre de places"
+      type="number"
+      value={nombrePlaces}
+      onChange={(e) => setNombrePlaces(parseInt(e.target.value))}
+      fullWidth
+      required
+      margin="normal"
+      InputProps={{ inputProps: { min: 1, max: event.places_disponibles } }}
+    />
 
-              <Collapse in={isReserving}>
-                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 2 }}>
-                  <TextField
-                    label="Nom"
-                    value={nom}
-                    onChange={(e) => setNom(e.target.value)}
-                    fullWidth
-                    required
-                    margin="normal"
-                  />
-                  <TextField
-                    label="Email"
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    fullWidth
-                    required
-                    margin="normal"
-                  />
-                  <TextField
-                    label="Nombre de places"
-                    type="number"
-                    value={nombrePlaces}
-                    onChange={(e) => setNombrePlaces(parseInt(e.target.value))}
-                    fullWidth
-                    required
-                    margin="normal"
-                    InputProps={{ inputProps: { min: 1, max: event.places_disponibles } }}
-                  />
-                  {error && (
-                    <Typography color="error" sx={{ mt: 1 }}>
-                      {error}
-                    </Typography>
-                  )}
-                  <Button
-                    type="submit"
-                    variant="contained"
-                    color={presqueComplet ? "warning" : "primary"}
-                    fullWidth
-                    sx={{ mt: 2 }}
-                  >
-                    Confirmer la réservation
-                  </Button>
-                </Box>
-              </Collapse>
-            </>
-          )}
+    <FormControlLabel
+      control={
+        <Checkbox
+          checked={acceptCGV}
+          onChange={(e) => setAcceptCGV(e.target.checked)}
+          required
+        />
+      }
+      label={
+        <>
+          J’accepte les{' '}
+          <Link href="/cgv" target="_blank" rel="noopener noreferrer">
+            Conditions Générales de Vente
+          </Link>
+        </>
+      }
+    />
+
+    {error && (
+      <Typography color="error" sx={{ mt: 1 }}>
+        {error}
+      </Typography>
+    )}
+
+    <Button
+      type="submit"
+      variant="contained"
+      color="primary"
+      disabled={!nom || !email || !nombrePlaces || !acceptCGV}
+    >
+      Confirmer la réservation
+    </Button>
+  </Box>
+</Collapse>
+  </>
+)}
+
         </CardContent>
       </Card>
+
+      <Dialog
+        open={showPaymentDialog}
+        onClose={handlePaymentCancel}
+        maxWidth="sm"
+        fullWidth
+      >
+        <ReservationForm
+          event={event}
+          onClose={handlePaymentCancel}
+          onSuccess={handlePaymentSuccess}
+          initialData={{
+            nom,
+            email,
+            nombre_places: nombrePlaces
+          }}
+        />
+      </Dialog>
     </Paper>
   );
 }

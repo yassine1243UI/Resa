@@ -19,12 +19,17 @@ export const fetchEvents = async () => {
 
 export const createReservation = async (reservationData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/reservations`, {
+    const response = await fetch(`${API_BASE_URL}/api/reserver`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(reservationData),
+      body: JSON.stringify({
+        nom: reservationData.nom,
+        email: reservationData.email,
+        "Nombre de place": reservationData.nombre_places,
+        evenement_id: reservationData.evenement_id
+      }),
     });
     return handleResponse(response);
   } catch (error) {

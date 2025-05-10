@@ -51,7 +51,7 @@ function EventList() {
   return (
     <Container sx={{ py: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ mb: 4 }}>
-        Événements disponibles
+        Événements disponibles 
       </Typography>
       <Grid container spacing={3}>
         {events.map((event) => (
