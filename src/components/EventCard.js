@@ -131,7 +131,7 @@ function EventCard({ event, onReserve }) {
                 fontWeight: presqueComplet ? 'bold' : 'normal'
               }}
             >
-              {event.places_disponibles} {getStatusText()}
+              {getStatusText()}
             </Typography>
           </Box>
           {isComplet ? (

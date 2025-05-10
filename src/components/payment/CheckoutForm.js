@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Box, Button, Typography, CircularProgress } from '@mui/material';
 import { loadStripe } from '@stripe/stripe-js';
 
-// const stripePromise = loadStripe('pk_live_51RI6RpB69mHHexglluQuy57Hcl3HUDKWKilqmzkwFhXLcV6kwHv0hux8aL5dQUgWq525fagSaGr6xagQbRE0uM2D00GgWuIgSo');
-const stripePromise = loadStripe('pk_test_51RI6SWBN1wIyqMvwQ8DawtkfxQVNkODBhH9iGzci3jwJWZMqeJnLXs5DY3b9BOff0YKhKcIYXjrSb72UsvVm0S1D00BnhA7aD6');
+const stripePromise = loadStripe('pk_live_51RI6RpB69mHHexglluQuy57Hcl3HUDKWKilqmzkwFhXLcV6kwHv0hux8aL5dQUgWq525fagSaGr6xagQbRE0uM2D00GgWuIgSo');
+// const stripePromise = loadStripe('pk_test_51RI6SWBN1wIyqMvwQ8DawtkfxQVNkODBhH9iGzci3jwJWZMqeJnLXs5DY3b9BOff0YKhKcIYXjrSb72UsvVm0S1D00BnhA7aD6');
 const CheckoutForm = ({ sessionId, amount }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
