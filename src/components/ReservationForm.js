@@ -14,11 +14,7 @@ import {
   StepLabel
 } from '@mui/material';
 import { createReservation } from '../services/api';
-import { Elements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
 import CheckoutForm from './payment/CheckoutForm';
-
-const stripePromise = loadStripe('pk_live_51RI6RpB69mHHexglluQuy57Hcl3HUDKWKilqmzkwFhXLcV6kwHv0hux8aL5dQUgWq525fagSaGr6xagQbRE0uM2D00GgWuIgSo');
 
 const steps = ['Informations', 'Paiement'];
 
@@ -66,9 +62,15 @@ function ReservationForm({ event, onClose, onSuccess, initialData }) {
         };
 
         const response = await createReservation(reservationData);
-        setReservationId(response.reservationId);
-        setClientSecret(response.clientSecret);
-        setActiveStep(1);
+
+        // Assurez-vous que la réponse contient un `reservationId` et `clientSecret`
+        if (response.reservationId && response.clientSecret) {
+          setReservationId(response.reservationId);
+          setClientSecret(response.clientSecret);
+          setActiveStep(1);
+        } else {
+          throw new Error('Les informations de réservation sont invalides');
+        }
       } catch (error) {
         setError(error.message);
       } finally {
@@ -154,15 +156,10 @@ function ReservationForm({ event, onClose, onSuccess, initialData }) {
           </Box>
         ) : (
           <Box sx={{ mt: 2 }}>
-            {clientSecret && (
-              <Elements stripe={stripePromise} options={{ clientSecret }}>
-                <CheckoutForm 
-                  amount={montantTotal}
-                  reservationId={reservationId}
-                  onSuccess={onSuccess}
-                />
-              </Elements>
-            )}
+            <CheckoutForm 
+              amount={montantTotal}
+              sessionId={clientSecret}
+            />
           </Box>
         )}
       </DialogContent>

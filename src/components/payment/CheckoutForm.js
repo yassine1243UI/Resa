@@ -1,56 +1,71 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+import { Box, Button, Typography, CircularProgress } from '@mui/material';
+import { loadStripe } from '@stripe/stripe-js';
 
-const CheckoutForm = () => {
-  const [quantity, setQuantity] = useState(1);
+// const stripePromise = loadStripe('pk_live_51RI6RpB69mHHexglluQuy57Hcl3HUDKWKilqmzkwFhXLcV6kwHv0hux8aL5dQUgWq525fagSaGr6xagQbRE0uM2D00GgWuIgSo');
+const stripePromise = loadStripe('pk_test_51RI6SWBN1wIyqMvwQ8DawtkfxQVNkODBhH9iGzci3jwJWZMqeJnLXs5DY3b9BOff0YKhKcIYXjrSb72UsvVm0S1D00BnhA7aD6');
+const CheckoutForm = ({ sessionId, amount }) => {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const handleBuy = async () => {
-    if (quantity < 1) {
-      alert('Veuillez sélectionner au moins une place.');
+  useEffect(() => {
+    if (sessionId) {
+      handlePayment();
+    }
+  }, [sessionId]);
+
+  const handlePayment = async () => {
+    if (!sessionId) {
+      setError('Session de paiement non valide');
       return;
     }
 
-    setLoading(true);
-
     try {
-      const res = await axios.post('https://resaback-production.up.railway.app/create-checkout-session', {
-        quantity,
+      setLoading(true);
+      setError(null);
+
+      const stripe = await stripePromise;
+      if (!stripe) {
+        throw new Error('Impossible d\'initialiser Stripe');
+      }
+
+      const { error } = await stripe.redirectToCheckout({
+        sessionId: sessionId
       });
-      window.location.href = res.data.url; // Redirection vers Stripe Checkout
+
+      if (error) {
+        throw error;
+      }
     } catch (err) {
-      console.error('Erreur lors de la création de la session :', err);
-      alert("Impossible de créer la session de paiement.");
+      console.error('Erreur de paiement:', err);
+      setError(err.message || 'Une erreur est survenue lors de la redirection vers le paiement.');
       setLoading(false);
     }
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto', textAlign: 'center' }}>
-      <h2>Réserver des places</h2>
+    <Box sx={{ width: '100%', mt: 2 }}>
+      <Typography variant="h6" gutterBottom>
+        Montant à payer : {amount}€
+      </Typography>
 
-      <label>
-        Nombre de places :
-        <input
-          type="number"
-          min="1"
-          value={quantity}
-          onChange={(e) => setQuantity(Number(e.target.value))}
-          style={{ marginLeft: '10px', width: '60px' }}
-          disabled={loading}
-        />
-      </label>
+      {error && (
+        <Typography color="error" sx={{ mb: 2 }}>
+          {error}
+        </Typography>
+      )}
 
-      <br /><br />
-
-      <button
-        onClick={handleBuy}
-        style={{ padding: '10px 20px' }}
+      <Button
+        onClick={handlePayment}
+        variant="contained"
+        color="primary"
+        fullWidth
         disabled={loading}
+        sx={{ mt: 2 }}
       >
-        {loading ? 'Redirection en cours...' : 'Confirmer la réservation'}
-      </button>
-    </div>
+        {loading ? <CircularProgress size={24} /> : 'Procéder au paiement'}
+      </Button>
+    </Box>
   );
 };
 

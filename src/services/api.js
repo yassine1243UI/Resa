@@ -19,7 +19,8 @@ export const fetchEvents = async () => {
 
 export const createReservation = async (reservationData) => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/reserver`, {
+    // Première étape : créer la réservation
+    const reservationResponse = await fetch(`${API_BASE_URL}/api/reserver`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -31,9 +32,28 @@ export const createReservation = async (reservationData) => {
         evenement_id: reservationData.evenement_id
       }),
     });
-    return handleResponse(response);
+    const reservationResult = await handleResponse(reservationResponse);
+
+    // Deuxième étape : créer la session de paiement Stripe
+    const checkoutResponse = await fetch(`${API_BASE_URL}/create-checkout-session`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        eventId: reservationData.evenement_id,
+        quantity: parseInt(reservationData.nombre_places),
+        reservationId: reservationResult.reservationId
+      }),
+    });
+    const checkoutResult = await handleResponse(checkoutResponse);
+
+    return {
+      reservationId: reservationResult.reservationId,
+      clientSecret: checkoutResult.id // Utiliser l'ID de la session comme clientSecret
+    };
   } catch (error) {
-    throw new Error('Impossible de créer la réservation');
+    throw new Error(error.message || 'Impossible de créer la réservation');
   }
 };
 

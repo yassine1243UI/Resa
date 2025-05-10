@@ -21,36 +21,46 @@ import WaitlistForm from './WaitlistForm';
 function EventCard({ event, onReserve }) {
   const [isReserving, setIsReserving] = useState(false);
   const [showPaymentDialog, setShowPaymentDialog] = useState(false);
-  const [nombrePlaces, setNombrePlaces] = useState(1);
+  const [nombre_places, setNombrePlaces] = useState(1);
   const [nom, setNom] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
   const [acceptCGV, setAcceptCGV] = useState(false); // État pour la case à cocher
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Empêche le comportement par défaut du formulaire
   
-    if (nombrePlaces < 1) {
+    if (nombre_places < 1) {
       alert("Veuillez sélectionner au moins une place.");
       return;
     }
   
     try {
+      // Envoie la requête au serveur pour créer une session Stripe
       const res = await axios.post('https://resaback-production.up.railway.app/create-checkout-session', {
-        quantity: nombrePlaces,
+        quantity: nombre_places,
         nom,
         email,
-        eventId: event.id, // utile si tu veux enregistrer la réservation ensuite
+        eventId: event.id,
       });
-
-      console.log('Session de paiement créée :', res.data);
-      
-      window.location.href = res.data.url; // Redirige vers Stripe Checkout
+  
+      // Récupère l'URL de redirection à partir de la réponse du serveur
+      const checkoutUrl = res.data.url;
+  
+      if (checkoutUrl) {
+        console.log("Redirection vers Stripe :", checkoutUrl);
+        window.location.href = checkoutUrl; // Redirige l'utilisateur vers Stripe
+      } else {
+        console.error("Aucune URL de session trouvée dans la réponse.");
+        alert("Une erreur est survenue lors de la création de la session de paiement.");
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Erreur lors de la redirection vers le paiement:', err);
       alert("Erreur lors de la redirection vers le paiement.");
     }
   };
+  
+
 
   const handlePaymentSuccess = () => {
     setShowPaymentDialog(false);
@@ -165,7 +175,7 @@ function EventCard({ event, onReserve }) {
     <TextField
       label="Nombre de places"
       type="number"
-      value={nombrePlaces}
+      value={nombre_places}
       onChange={(e) => setNombrePlaces(parseInt(e.target.value))}
       fullWidth
       required
@@ -201,7 +211,7 @@ function EventCard({ event, onReserve }) {
       type="submit"
       variant="contained"
       color="primary"
-      disabled={!nom || !email || !nombrePlaces || !acceptCGV}
+      disabled={!nom || !email || !nombre_places || !acceptCGV}
     >
       Confirmer la réservation
     </Button>
@@ -226,7 +236,7 @@ function EventCard({ event, onReserve }) {
           initialData={{
             nom,
             email,
-            nombre_places: nombrePlaces
+            nombre_places: nombre_places
           }}
         />
       </Dialog>
