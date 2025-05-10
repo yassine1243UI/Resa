@@ -1,35 +1,27 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { CircularProgress, Alert, Container } from '@mui/material';
+import { useLocation } from 'react-router-dom';
 
 const SuccessPage = () => {
   const [status, setStatus] = useState('pending');
-  
+  const location = useLocation();
+
   useEffect(() => {
-    // Lire les informations depuis les cookies
-    const cookies = document.cookie.split(';');
-    let sessionId = '';
-    let eventId = '';
-    let quantity = 0;
-
-    // Chercher les cookies et extraire les informations nécessaires
-    cookies.forEach((cookie) => {
-      if (cookie.trim().startsWith('paymentData=')) {
-        const paymentData = JSON.parse(cookie.split('=')[1]);
-        sessionId = paymentData.sessionId;
-        eventId = paymentData.eventId;
-        quantity = paymentData.quantity;
-      }
-    });
-
-    console.log('sessionId:', sessionId, 'eventId:', eventId, 'quantity:', quantity);  // Ajoute un log pour vérifier
-
+    const queryParams = new URLSearchParams(location.search);
+    const sessionId = queryParams.get('session_id');
+    const eventId = queryParams.get('event_id');
+    const quantity = queryParams.get('places');
+  
+    console.log('sessionId:', sessionId, 'eventId:', eventId, 'quantity:', quantity);
+  
     if (sessionId && eventId && quantity) {
-      // Envoi des données via POST
-      axios.post('https://resaback-production.up.railway.app/api/verify-payment', {
-        sessionId,
-        eventId,
-        quantity
+      axios.get('https://resaback-production.up.railway.app/api/verify-payment', {
+        params: {
+          session_id: sessionId,
+          event_id: eventId,
+          places: quantity
+        }
       })
         .then((response) => {
           console.log('Vérification du paiement réussie :', response.data);
@@ -44,10 +36,11 @@ const SuccessPage = () => {
           setStatus('error');
         });
     } else {
-      console.error('Paramètres manquants dans les cookies.');
+      console.error('Paramètres manquants :', { sessionId, eventId, quantity });
       setStatus('error');
     }
-  }, []);
+  }, [location]);
+  // Ajout de location pour être sûr de prendre en compte les changements d'URL
 
   return (
     <Container maxWidth="sm" style={{ marginTop: '50px', textAlign: 'center' }}>
