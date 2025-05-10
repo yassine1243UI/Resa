@@ -14,7 +14,7 @@ const CheckoutForm = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:3001/create-checkout-session', {
+      const res = await axios.post('https://resaback-production.up.railway.app/create-checkout-session', {
         quantity,
       });
       window.location.href = res.data.url; // Redirection vers Stripe Checkout
