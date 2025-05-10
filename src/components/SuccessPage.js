@@ -1,17 +1,28 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { CircularProgress, Alert, Container } from '@mui/material';
-import { useLocation } from 'react-router-dom';
 
 const SuccessPage = () => {
   const [status, setStatus] = useState('pending');
-  const location = useLocation();
-
+  
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const sessionId = queryParams.get('session_id');
-    const eventId = queryParams.get('event_id');
-    const quantity = queryParams.get('places');
+    // Lire les informations depuis les cookies
+    const cookies = document.cookie.split(';');
+    let sessionId = '';
+    let eventId = '';
+    let quantity = 0;
+
+    // Chercher les cookies et extraire les informations nécessaires
+    cookies.forEach((cookie) => {
+      if (cookie.trim().startsWith('paymentData=')) {
+        const paymentData = JSON.parse(cookie.split('=')[1]);
+        sessionId = paymentData.sessionId;
+        eventId = paymentData.eventId;
+        quantity = paymentData.quantity;
+      }
+    });
+
+    console.log('sessionId:', sessionId, 'eventId:', eventId, 'quantity:', quantity);  // Ajoute un log pour vérifier
 
     if (sessionId && eventId && quantity) {
       // Envoi des données via POST
@@ -33,7 +44,7 @@ const SuccessPage = () => {
           setStatus('error');
         });
     } else {
-      console.error('Paramètres manquants :', { sessionId, eventId, quantity });
+      console.error('Paramètres manquants dans les cookies.');
       setStatus('error');
     }
   }, []);
@@ -51,7 +62,6 @@ const SuccessPage = () => {
         <Alert severity="success">
           Paiement confirmé ! Votre réservation a bien été prise en compte.
         </Alert>
-
       )}
 
       {status === 'error' && (
@@ -60,25 +70,25 @@ const SuccessPage = () => {
         </Alert>
       )}
 
-<div style={{ marginTop: '20px', textAlign: 'center' }}>
-  <button
-    onClick={() => window.location.href = '/'}
-    style={{
-      padding: '10px 20px',
-      backgroundColor: '#4CAF50',
-      color: 'white',
-      border: 'none',
-      borderRadius: '8px',
-      fontSize: '16px',
-      cursor: 'pointer',
-      transition: 'background-color 0.3s ease',
-    }}
-    onMouseOver={(e) => e.target.style.backgroundColor = '#45a049'}
-    onMouseOut={(e) => e.target.style.backgroundColor = '#4CAF50'}
-  >
-    ⬅ Retour à l'accueil
-  </button>
-</div>
+      <div style={{ marginTop: '20px', textAlign: 'center' }}>
+        <button
+          onClick={() => window.location.href = '/'}
+          style={{
+            padding: '10px 20px',
+            backgroundColor: '#4CAF50',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            fontSize: '16px',
+            cursor: 'pointer',
+            transition: 'background-color 0.3s ease',
+          }}
+          onMouseOver={(e) => e.target.style.backgroundColor = '#45a049'}
+          onMouseOut={(e) => e.target.style.backgroundColor = '#4CAF50'}
+        >
+          ⬅ Retour à l'accueil
+        </button>
+      </div>
     </Container>
   );
 };
