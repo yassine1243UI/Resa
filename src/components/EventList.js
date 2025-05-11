@@ -21,7 +21,7 @@ function EventList() {
       setEvents(data);
       setError(null);
     } catch (error) {
-      console.error('Erreur:', error);
+
       setError('Impossible de charger les événements');
     } finally {
       setLoading(false);

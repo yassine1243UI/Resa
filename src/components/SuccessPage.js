@@ -13,7 +13,6 @@ const SuccessPage = () => {
     const eventId = queryParams.get('event_id');
     const quantity = queryParams.get('places');
   
-    console.log('sessionId:', sessionId, 'eventId:', eventId, 'quantity:', quantity);
   
     if (sessionId && eventId && quantity) {
       axios.get('https://resaback-production.up.railway.app/api/verify-payment', {
@@ -24,7 +23,6 @@ const SuccessPage = () => {
         }
       })
         .then((response) => {
-          console.log('Vérification du paiement réussie :', response.data);
           if (response.data.success) {
             setStatus('success');
           } else {
@@ -32,11 +30,11 @@ const SuccessPage = () => {
           }
         })
         .catch((error) => {
-          console.error('Erreur lors de la vérification du paiement :', error);
+
           setStatus('error');
         });
     } else {
-      console.error('Paramètres manquants :', { sessionId, eventId, quantity });
+
       setStatus('error');
     }
   }, [location]);

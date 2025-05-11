@@ -37,7 +37,7 @@ const CheckoutForm = ({ sessionId, amount }) => {
         throw error;
       }
     } catch (err) {
-      console.error('Erreur de paiement:', err);
+
       setError(err.message || 'Une erreur est survenue lors de la redirection vers le paiement.');
       setLoading(false);
     }

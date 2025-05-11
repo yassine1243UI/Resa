@@ -30,7 +30,7 @@ function WaitlistForm() {
         const data = await res.json();
         setEvents(data);
       } catch (err) {
-        console.error('Erreur récupération événements:', err);
+
       }
     };
     fetchEvents();
@@ -61,7 +61,7 @@ function WaitlistForm() {
         alert('Erreur lors de l’inscription');
       }
     } catch (err) {
-      console.error(err);
+
       alert('Erreur réseau');
     }
   };

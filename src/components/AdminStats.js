@@ -20,7 +20,7 @@ function AdminStats() {
       try {
         const data = await getStats();
         setStats(data);
-        console.log(data);
+
         setError(null);
       } catch (err) {
         setError(err.message);

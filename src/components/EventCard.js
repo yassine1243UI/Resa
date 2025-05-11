@@ -48,14 +48,14 @@ function EventCard({ event, onReserve }) {
       const checkoutUrl = res.data.url;
   
       if (checkoutUrl) {
-        console.log("Redirection vers Stripe :", checkoutUrl);
+
         window.location.href = checkoutUrl; // Redirige l'utilisateur vers Stripe
       } else {
-        console.error("Aucune URL de session trouvée dans la réponse.");
+
         alert("Une erreur est survenue lors de la création de la session de paiement.");
       }
     } catch (err) {
-      console.error('Erreur lors de la redirection vers le paiement:', err);
+
       alert("Erreur lors de la redirection vers le paiement.");
     }
   };

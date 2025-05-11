@@ -16,7 +16,7 @@ const PayPalButton = ({ amount, onSuccess }) => {
       }),
       onApprove: (data, actions) => actions.order.capture().then(onSuccess),
       onError: (err) => {
-        console.error('Erreur PayPal :', err);
+
         alert('Erreur lors du paiement PayPal.');
       }
     }).render(paypalRef.current);
