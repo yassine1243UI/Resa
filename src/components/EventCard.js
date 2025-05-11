@@ -25,7 +25,51 @@ function EventCard({ event, onReserve }) {
   const [nom, setNom] = useState('');
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');
-  const [acceptCGV, setAcceptCGV] = useState(false); // État pour la case à cocher
+  const [acceptCGV, setAcceptCGV] = useState(false);
+  const [nomWait, setNomWait] = useState('');
+  const [prenomWait, setPrenomWait] = useState('');
+  const [emailWait, setEmailWait] = useState('');
+  const [placesWait, setPlacesWait] = useState(1);
+  const [errorWait, setErrorWait] = useState('');
+  const [successWait, setSuccessWait] = useState('');
+  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
+
+
+  const handleWaitlistSubmit = async (e) => {
+    e.preventDefault();
+    setErrorWait('');
+    setSuccessWait('');
+
+    try {
+      const response = await fetch('https://resaback-production.up.railway.app/api/waitlist', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          nom: nomWait,
+          prenom: prenomWait,
+          email: emailWait,
+          places_souhaitees: placesWait,
+          evenement: event.nom
+        }),
+      });
+
+      if (response.ok) {
+        setSuccessWait('Votre inscription à la liste d\'attente a bien été prise en compte.');
+        setNomWait('');
+        setPrenomWait('');
+        setEmailWait('');
+        setPlacesWait(1);
+      } else {
+        const error = await response.text();
+        setErrorWait(error || 'Une erreur est survenue');
+      }
+    } catch (error) {
+      setErrorWait('Une erreur est survenue lors de l\'inscription');
+      console.error('Erreur:', error);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault(); // Empêche le comportement par défaut du formulaire
@@ -48,14 +92,14 @@ function EventCard({ event, onReserve }) {
       const checkoutUrl = res.data.url;
   
       if (checkoutUrl) {
-
+        console.log("Redirection vers Stripe :", checkoutUrl);
         window.location.href = checkoutUrl; // Redirige l'utilisateur vers Stripe
       } else {
-
+        console.error("Aucune URL de session trouvée dans la réponse.");
         alert("Une erreur est survenue lors de la création de la session de paiement.");
       }
     } catch (err) {
-
+      console.error('Erreur lors de la redirection vers le paiement:', err);
       alert("Erreur lors de la redirection vers le paiement.");
     }
   };
@@ -134,13 +178,83 @@ function EventCard({ event, onReserve }) {
               {getStatusText()}
             </Typography>
           </Box>
-          {isComplet ? (
+          {event.places_disponibles === 0 ? (
   <>
-    <Typography color="error" sx={{ mt: 2, mb: 1 }}>
+    <Typography color="error" sx={{ mt: 2 }}>
       Toutes les places sont prises. Vous pouvez vous inscrire à la liste d'attente :
     </Typography>
-    <WaitlistForm eventName={event.nom} />
+
+    <Button
+      variant="outlined"
+      color="primary"
+      onClick={() => setIsWaitlistOpen(!isWaitlistOpen)}
+      sx={{ mt: 2 }}
+    >
+      {isWaitlistOpen ? 'Annuler' : 'S’inscrire à la liste d’attente'}
+    </Button>
+
+    <Collapse in={isWaitlistOpen}>
+      <Box component="form" onSubmit={handleWaitlistSubmit} sx={{ mt: 2 }}>
+        <TextField
+          label="Nom"
+          value={nomWait}
+          onChange={(e) => setNomWait(e.target.value)}
+          fullWidth
+          required
+          margin="normal"
+        />
+        <TextField
+          label="Prénom"
+          value={prenomWait}
+          onChange={(e) => setPrenomWait(e.target.value)}
+          fullWidth
+          required
+          margin="normal"
+        />
+        <TextField
+          label="Email"
+          type="email"
+          value={emailWait}
+          onChange={(e) => setEmailWait(e.target.value)}
+          fullWidth
+          required
+          margin="normal"
+        />
+        <TextField
+          label="Nombre de places souhaitées"
+          type="number"
+          value={placesWait}
+          onChange={(e) => setPlacesWait(parseInt(e.target.value))}
+          fullWidth
+          required
+          margin="normal"
+          InputProps={{ inputProps: { min: 1 } }}
+        />
+
+        {errorWait && (
+          <Typography color="error" sx={{ mt: 1 }}>
+            {errorWait}
+          </Typography>
+        )}
+        {successWait && (
+          <Typography color="primary" sx={{ mt: 1 }}>
+            {successWait}
+          </Typography>
+        )}
+
+        <Button
+          type="submit"
+          variant="contained"
+          color="primary"
+          sx={{ mt: 2 }}
+          disabled={!nomWait || !prenomWait || !emailWait || !placesWait}
+        >
+          Confirmer l’inscription
+        </Button>
+      </Box>
+    </Collapse>
   </>
+
 ) : (
   <>
     <Button
