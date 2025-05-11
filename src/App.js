@@ -65,10 +65,10 @@ function App() {
           </AppBar>
           <Container maxWidth="lg">
             <Routes>
-              <Route path="/" element={<EventList />} />
+              <Route path="/billeterie" element={<EventList />} />
               <Route path="/success" element={<SuccessPage />} />
               <Route path="/cgv" element={<CGVPage />} />
-              <Route path="/accueil" element={<Accueil />} />
+              <Route path="/" element={<Accueil />} />
             </Routes>
           </Container>
 

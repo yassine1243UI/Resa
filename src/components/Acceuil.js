@@ -78,7 +78,7 @@ const Accueil = () => {
           <Button
             variant="contained"
             size="large"
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/billeterie')}
             sx={{
               fontSize: '1.2rem',
               py: 2,
