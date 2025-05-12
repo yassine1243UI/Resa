@@ -69,6 +69,15 @@ function WaitlistForm({ eventId, eventName, initialStep = 'collapsed' }) {
     }
   };
 
+  useEffect(() => {
+    if (submitted) {
+      const timer = setTimeout(() => {
+        setSubmitted(false);
+      }, 3000); // 3 secondes
+
+      return () => clearTimeout(timer); // nettoie le timer si le composant est démonté
+    }
+  }, [submitted]);
   return (
     <Paper
       elevation={8}

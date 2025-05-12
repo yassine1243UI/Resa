@@ -58,8 +58,8 @@ function App() {
                 <img src={Logo} alt="Logo" style={{ height: '40px', marginRight: '16px' }} />
               </Box>
               <Box>
-                <Button component={Link} to="/" color="inherit">Billetterie</Button>
-                <Button component={Link} to="/accueil" color="inherit">Accueil</Button>
+                <Button component={Link} to="/billeterie" color="inherit">Billetterie</Button>
+                <Button component={Link} to="/" color="inherit">Accueil</Button>
               </Box>
             </Toolbar>
           </AppBar>
