@@ -60,7 +60,6 @@ function App() {
               <Box>
                 <Button component={Link} to="/billeterie" color="inherit">Billetterie</Button>
                 <Button component={Link} to="/" color="inherit">Accueil</Button>
-                <Button component={Link} to="/admin/events" color="inherit">Admin</Button>
               </Box>
             </Toolbar>
           </AppBar>
