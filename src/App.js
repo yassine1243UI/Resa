@@ -7,7 +7,7 @@ import SuccessPage from './components/SuccessPage';
 import Waitlist from './components/WaitlistForm'; // ✅ Import du composant
 import CGVPage from './components/CGVPage';
 import Accueil from './components/Acceuil';
-import Logo from './img/Logo.jpg'; // ✅ Import du logo
+import Logo from './img/Logo.jpg';
 
 const theme = createTheme({
   palette: {
@@ -60,6 +60,7 @@ function App() {
               <Box>
                 <Button component={Link} to="/billeterie" color="inherit">Billetterie</Button>
                 <Button component={Link} to="/" color="inherit">Accueil</Button>
+                <Button component={Link} to="/admin/events" color="inherit">Admin</Button>
               </Box>
             </Toolbar>
           </AppBar>
