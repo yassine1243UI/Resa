@@ -61,6 +61,19 @@ function WaitlistForm({ eventId, eventName, initialStep = 'collapsed' }) {
 
       if (res.ok) {
         setSubmitted(true);
+      
+        // Attend 3 secondes avant de fermer le formulaire
+        setTimeout(() => {
+          setSubmitted(false);
+          setStep('collapsed');
+          setFormData({
+            nom: '',
+            prenom: '',
+            email: '',
+            evenement: '',
+            places_souhaitees: 1
+          });
+        }, 3000);
       } else {
         alert('Erreur lors de l’inscription');
       }
