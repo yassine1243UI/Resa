@@ -3,9 +3,9 @@
   "name": "Abou Foley Billetterie",
   "icons": [
     {
-      "src": "logo.png",
+      "src": "logo.jpg",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/jpg"
     }
   ],
   "start_url": ".",
