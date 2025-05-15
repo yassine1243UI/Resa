@@ -150,8 +150,16 @@ function EventCard({ event, onReserve }) {
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
             <CalendarMonth sx={{ mr: 1 }} color="action" />
             <Typography variant="body2">
-              {new Date(event.date_evenement).toLocaleDateString()}
+              {new Date(event.date_evenement.replace(' ', 'T')).toLocaleString('fr-FR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
             </Typography>
+
+
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
