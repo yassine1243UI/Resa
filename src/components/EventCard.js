@@ -11,7 +11,7 @@ import {
   Dialog,
   Checkbox, FormControlLabel, Link
 } from '@mui/material';
-import { CalendarMonth, LocationOn, Euro } from '@mui/icons-material';
+import { CalendarMonth, LocationOn, Euro, AccessTime  } from '@mui/icons-material';
 import { createReservation } from '../services/api';
 import ReservationForm from './ReservationForm';
 import axios from 'axios';
@@ -147,20 +147,26 @@ function EventCard({ event, onReserve }) {
             {event.description}
           </Typography>
 
-          <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-            <CalendarMonth sx={{ mr: 1 }} color="action" />
-            <Typography variant="body2">
-              {new Date(event.date_evenement.replace(' ', 'T')).toLocaleString('fr-FR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </Typography>
+          <Box display="flex" alignItems="center">
+          <CalendarMonth sx={{ mr: 1 }} color="action" />
+          <Typography variant="body2">
+            {new Date(event.date_evenement.replace(' ', 'T')).toLocaleDateString('fr-FR', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+            })}
+          </Typography>
+        </Box>
 
-
-          </Box>
+        <Box display="flex" alignItems="center" mt={0.5}>
+          <AccessTime sx={{ mr: 1 }} color="action" />
+          <Typography variant="body2">
+            {new Date(event.date_evenement.replace(' ', 'T')).toLocaleTimeString('fr-FR', {
+              hour: '2-digit',
+              minute: '2-digit',
+            })}
+          </Typography>
+        </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
             <LocationOn sx={{ mr: 1 }} color="action" />
