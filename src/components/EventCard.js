@@ -135,9 +135,6 @@ function EventCard({ event, onReserve }) {
     return 'success.main';
   };
 
-  const correctedDate = new Date(event.date_evenement.replace(' ', 'T'));
-correctedDate.setHours(correctedDate.getHours() - 2);
-
   return (
     <Paper elevation={3} sx={{ mb: 2 }}>
       <Card>
@@ -153,10 +150,10 @@ correctedDate.setHours(correctedDate.getHours() - 2);
           <Box display="flex" alignItems="center">
             <CalendarMonth sx={{ mr: 1 }} color="action" />
             <Typography variant="body2">
-              {correctedDate.toLocaleDateString('fr-FR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric',
+              {new Date(event.date_evenement).toLocaleDateString('fr-FR', {
+                  day: '2-digit',
+                  month: '2-digit',
+                  year: 'numeric',
               })}
             </Typography>
           </Box>
@@ -164,7 +161,7 @@ correctedDate.setHours(correctedDate.getHours() - 2);
           <Box display="flex" alignItems="center" mt={0.5}>
             <AccessTime sx={{ mr: 1 }} color="action" />
             <Typography variant="body2">
-              {correctedDate.toLocaleTimeString('fr-FR', {
+              {new Date(event.date_evenement).toLocaleTimeString('fr-FR', {
                 hour: '2-digit',
                 minute: '2-digit',
               })}
