@@ -11,6 +11,7 @@ import {
   Paper
 } from '@mui/material';
 import { useMediaQuery, useTheme } from '@mui/material';
+import API_BASE_URL from '../config';
 
 function WaitlistForm({ eventId, eventName, initialStep = 'collapsed' }) {
   const [showForm, setShowForm] = useState(false);
@@ -30,7 +31,7 @@ function WaitlistForm({ eventId, eventName, initialStep = 'collapsed' }) {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const res = await fetch('https://resaback-production.up.railway.app/api/evenements');
+        const res = await fetch(`${API_BASE_URL}/api/evenements`);
         const data = await res.json();
         setEvents(data);
       } catch (err) {
@@ -53,7 +54,7 @@ function WaitlistForm({ eventId, eventName, initialStep = 'collapsed' }) {
         evenement: eventName || formData.evenement || 'Peu importe'
       };
 
-      const res = await fetch('https://resaback-production.up.railway.app/api/waitlist', {
+      const res = await fetch(`${API_BASE_URL}/api/waitlist`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(cleanData)

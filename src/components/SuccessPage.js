@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { CircularProgress, Alert, Container } from '@mui/material';
 import { useLocation } from 'react-router-dom';
+import  API_BASE_URL  from '../config'; // Assurez-vous que le chemin est correct
 
 const SuccessPage = () => {
   const [status, setStatus] = useState('pending');
@@ -15,7 +16,7 @@ const SuccessPage = () => {
   
   
     if (sessionId && eventId && quantity) {
-      axios.get('https://resaback-production.up.railway.app/api/verify-payment', {
+      axios.get(`${API_BASE_URL}/api/verify-payment`, {
         params: {
           session_id: sessionId,
           event_id: eventId,

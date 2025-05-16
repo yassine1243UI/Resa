@@ -16,6 +16,7 @@ import { createReservation } from '../services/api';
 import ReservationForm from './ReservationForm';
 import axios from 'axios';
 import WaitlistForm from './WaitlistForm';
+import API_BASE_URL from '../config';
 
 
 function EventCard({ event, onReserve }) {
@@ -41,7 +42,7 @@ function EventCard({ event, onReserve }) {
     setSuccessWait('');
 
     try {
-      const response = await fetch('https://resaback-production.up.railway.app/api/waitlist', {
+      const response = await fetch(`${API_BASE_URL}/api/waitlist`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -71,39 +72,55 @@ function EventCard({ event, onReserve }) {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault(); // Empêche le comportement par défaut du formulaire
-  
-    if (nombre_places < 1) {
-      alert("Veuillez sélectionner au moins une place.");
-      return;
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  if (nombre_places < 1) {
+    alert("Veuillez sélectionner au moins une place.");
+    return;
+  }
+
+  try {
+    // Étape 1 : Créer la réservation
+    const res = await axios.post(`${API_BASE_URL}/api/reserver`, {
+      nom,
+      email,
+      nombre_places,
+      evenement_id: event.id,
+    });
+
+    // console.log("Réponse de la réservation :", res.data);
+    if (res.data && res.data.reservationId) {
+  const reservationId = res.data.reservationId;
+
+  // Puis faire l'appel pour la session Stripe
+  const checkoutRes = await axios.post(`${API_BASE_URL}/create-checkout-session`, {
+    quantity: nombre_places,
+    nom,
+    email,
+    eventId: event.id,
+    reservationId,
+  });
+
+  const checkoutUrl = checkoutRes.data.url;
+
+  if (checkoutUrl) {
+    window.location.href = checkoutUrl;
+  } else {
+    alert("Erreur lors de la création de la session Stripe.");
+  }
+} else {
+  alert("Erreur lors de la création de la réservation.");
+}
+  } catch (error) {
+    console.error("Erreur lors de la réservation :", error);
+    if (error.response && error.response.data) {
+      setError(error.response.data.message || 'Une erreur est survenue');
+    } else {
+      setError('Une erreur est survenue lors de la réservation');
     }
-  
-    try {
-      // Envoie la requête au serveur pour créer une session Stripe
-      const res = await axios.post('https://resaback-production.up.railway.app/create-checkout-session', {
-        quantity: nombre_places,
-        nom,
-        email,
-        eventId: event.id,
-      });
-  
-      // Récupère l'URL de redirection à partir de la réponse du serveur
-      const checkoutUrl = res.data.url;
-  
-      if (checkoutUrl) {
-        console.log("Redirection vers Stripe :", checkoutUrl);
-        window.location.href = checkoutUrl; // Redirige l'utilisateur vers Stripe
-      } else {
-        console.error("Aucune URL de session trouvée dans la réponse.");
-        alert("Une erreur est survenue lors de la création de la session de paiement.");
-      }
-    } catch (err) {
-      console.error('Erreur lors de la redirection vers le paiement:', err);
-      alert("Erreur lors de la redirection vers le paiement.");
-    }
-  };
-  
+  }
+};
 
 
   const handlePaymentSuccess = () => {
