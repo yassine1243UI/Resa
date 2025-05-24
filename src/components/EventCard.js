@@ -122,7 +122,7 @@ function EventCard({ event, onReserve }) {
   };
 
   const isComplet = event.places_disponibles <= 0;
-  const presqueComplet = event.places_disponibles <= 10 && event.places_disponibles > 0;
+  const presqueComplet = event.places_disponibles <= 20 && event.places_disponibles > 0;
 
   const getStatusText = () => {
     if (isComplet) return 'COMPLET';
