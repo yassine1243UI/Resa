@@ -57,23 +57,23 @@ const Accueil = () => {
             textAlign: 'left',
           }}
         >
-          <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
-            L'humour en direct, c'est autre chose !
-          </Typography>
+<Typography
+  variant="h3"
+  component="h1"
+  gutterBottom
+  sx={{ fontWeight: 'bold', mb: 4 }}
+>
+  T’as aimé ses vidéos ? <br />
+  En spectacle, il allume encore plus !
+</Typography>
 
-          <Typography variant="h5" sx={{ mb: 4, fontStyle: 'italic' }}>
-            Les blagues sur Youtube, c'est sympa... mais en direct, dans un théâtre, c'est un tout autre niveau !
-          </Typography>
-
-          <Typography variant="body1" sx={{ mb: 4, fontSize: '1.2rem', lineHeight: 1.6 }}>
-            Viens participer à la création de mon nouveau spectacle avec des vannes inédites chaque semaine. 
-            Quoi de mieux que l'ambiance d'un petit théâtre intimiste pour passer une excellente soirée ?
-          </Typography>
-
-          <Typography variant="body1" sx={{ mb: 6, fontSize: '1.2rem', lineHeight: 1.6 }}>
-            Et ce n'est pas tout : à la fin de chaque représentation, on enregistre ensemble ma chronique sur l'actu. 
-            Tu ris, tu applaudis, tu participes au podcast. Bref, tu fais partie de l'aventure !
-          </Typography>
+<Typography
+  variant="body1"
+  sx={{ mb: 6, fontSize: '1.2rem', lineHeight: 1.6 }}
+>
+  Viens profiter du franc-parler et de l’humour piquant d’Abou Foley dans un spectacle de stand-up à Paris, 
+  avec des nouveautés chaque semaine. Le genre d’expérience qu’on n’explique pas mais qu’on vit !
+</Typography>
 
           <Button
             variant="contained"
@@ -92,9 +92,6 @@ const Accueil = () => {
             Réserver mes places
           </Button>
 
-          <Typography variant="body2" sx={{ mt: 4, fontStyle: 'italic' }}>
-            Alors, si après TOUT ça, tu n'es pas convaincu de prendre au moins 15 places, je ne sais plus quoi faire !
-          </Typography>
         </Box>
       </Box>
     </Box>
